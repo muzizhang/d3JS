@@ -22,6 +22,11 @@ const routes = [
     path: '/operation',
     name: 'operation',
     component: () => import('../views/Operation')
+  },
+  {
+    path: '/drag',
+    name: 'drag',
+    component: () => import('../views/drag')
   }
 ]
 
