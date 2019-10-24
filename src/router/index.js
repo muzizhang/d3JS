@@ -27,6 +27,11 @@ const routes = [
     path: '/drag',
     name: 'drag',
     component: () => import('../views/drag')
+  },
+  {
+    path: '/line',
+    name: 'line',
+    component: () => import('../views/line')
   }
 ]
 

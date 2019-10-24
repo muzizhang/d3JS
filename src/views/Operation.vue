@@ -72,7 +72,7 @@ export default {
           .on('start', function() {
             console.log('drag start')
           })
-          .on('drag', function(e, i) {
+          .on('drag', function(d, i) {
             // range=scale(domain) domain=scale.invert(range)
             let newValue = that.scale().yScale.invert(d3.event.y).toFixed(1)
             if (newValue > d3.max(that.dataset)) newValue = 100

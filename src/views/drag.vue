@@ -40,15 +40,20 @@ export default {
       svgWidth: 800,
       svgHeight: 600,
       margin: {
-        top: 70,
-        left: 70,
-        bottom: 70,
+        top: 100,
+        left: 100,
+        bottom: 100,
         right: 30
       },
       name: [],
       label: [],
       width: 0,
-      height: 0
+      height: 0,
+      g: '',
+      text: '',
+      svg: '',
+      inputWidth: 200,
+      inputHeight: 30
     }
   },
   mounted() {
@@ -57,7 +62,7 @@ export default {
   methods: {
     init() {
       // 1. 创建画布
-      const svg = d3.select('#drag')
+      this.svg = d3.select('#drag')
         .append('svg')
         .attr('width', this.svgWidth)
         .attr('height', this.svgHeight)
@@ -69,17 +74,18 @@ export default {
         this.name.push(d.name)
         this.label.push(d.label)
       })
-      const g = svg.append('g').attr('class', 'oneStep')
-      g.append('g')
+      this.g = (this.svg).append('g').attr('class', 'oneStep')
+      this.g.append('g')
+        .attr('class', 'axis')
         .attr('transform', `translate(${this.margin.left}, ${this.height + this.margin.top})`)
         .call(d3.axisBottom(this.scale().xScale))
-      g.append('g')
+      this.g.append('g')
+        .attr('class', 'axis')
         .attr('transform', `translate(${this.margin.left}, ${this.margin.top})`)
         .call(d3.axisLeft(this.scale().yScale))
       // 标题文字
-      const text = g.append('g')
-        .attr('fill', 'red')
-      text.append('text')
+      this.text = (this.g).append('g').attr('fill', 'red')
+      this.text.append('text')
         .attr('id', 'title')
         .attr('x', this.svgWidth / 2)
         .attr('y', this.margin.top / 2)
@@ -87,25 +93,28 @@ export default {
         .attr('dy', 0)
         .attr('text-anchor', 'middle')
         .text('这是一个标题')
-      text.append('text')
+        .on('dblclick', () => { this.title('title') })
+      console.log((this.svgHeight - this.inputHeight) / 2)
+      this.text.append('text')
         .attr('id', 'vertical')
-        // .attr('x', this.margin.left / 4)
-        // .attr('y', this.svgHeight / 2)
-        .attr('transform', `translate(${this.margin.left / 2.5}, ${this.svgHeight / 2}) rotate(-90)`)
+        .attr('transform', `translate(${(this.margin.left - this.inputHeight) / 2}, ${(this.svgHeight - this.inputHeight) / 2}) rotate(-90)`)
         .attr('dx', 0)
         .attr('dy', 0)
         .text('纵轴')
         .attr('fill', 'red')
-      text.append('text')
+        .on('dblclick', () => { this.title('vertical') })
+      this.text.append('text')
         .attr('id', 'horizontal')
         .attr('x', this.svgWidth / 2)
-        .attr('y', this.svgHeight - this.margin.bottom / 4)
+        .attr('y', this.svgHeight - this.margin.bottom * 2 / 5)
         .attr('dx', 0)
         .attr('dy', 0)
         .text('横轴')
         .attr('fill', 'red')
+        .on('dblclick', () => { this.title('horizontal') })
       // 矩形
-      g.selectAll('.rect')
+      const that = this
+      this.g.selectAll('.rect')
         .data(this.dataset)
         .enter()
         .append('rect')
@@ -121,8 +130,30 @@ export default {
         .attr('height', (d) => {
           return this.height - this.scale().yScale(d.label)
         })
+        .call(
+        // 绑定拖拽事件
+          d3.drag()
+            .on('start', function() {
+              console.log('drag start')
+              // 清除所有输入框
+              d3.selectAll('foreignObject').remove()
+            })
+            .on('drag', function(d, i) {
+              let newValue = that.scale().yScale.invert(d3.event.y).toFixed(0)
+              if (newValue > d3.max(that.label)) newValue = d3.max(that.label)
+              if (newValue < 0) newValue = 0
+
+              that.dataset[i].label = newValue
+              that.toRender(i)
+              console.log('drag ing')
+            })
+            .on('end', function() {
+              that.toRender()
+              console.log('drag end')
+            })
+        )
       // 文字
-      g.selectAll('.text')
+      this.g.selectAll('.text')
         .data(this.dataset)
         .enter()
         .append('text')
@@ -133,11 +164,74 @@ export default {
         .attr('y', (d) => {
           return this.scale().yScale(d.label) + this.margin.top
         })
-        .attr('dx', 1)
-        .attr('dy', 1)
+        .attr('dx', this.scale().xScale.bandwidth() / 2 - 10)
+        .attr('dy', -10)
+        .style('font-weight', '700')
         .text(function(d) {
           return d.label
         })
+        .on('dblclick', (d, i) => { this.showInput(d, i) })
+    },
+    showInput(d, i) {
+      // 显示input 输入框
+      this.g.append('foreignObject')
+        .attr('id', i)
+        .attr('width', this.scale().xScale.bandwidth())
+        .attr('height', 35)
+        .attr('x', this.scale().xScale(d.name) + this.margin.left)
+        .attr('y', this.scale().yScale(d.label) + this.margin.top * 3.5 / 5)
+        .append('xhtml:div')
+        .attr('xmlns', 'http://www.w3.org/1999/xhtml')
+        .append('input')
+        .attr('class', 'input' + i)
+        .attr('value', d.label)
+        .style('width', this.scale().xScale.bandwidth() + 'px')
+        .style('font-weight', '700')
+        .style('font-size', '16px')
+        .attr('autofocus', 'true')
+        .on('change', () => { this.updateValue(i) })
+    },
+    updateValue(i) {
+      // 获取输入框中修改的值
+      const value = document.getElementsByClassName(`input${i}`).item(0).value
+      this.dataset[i].label = value * 1
+      // 重新渲染数据
+      this.toRender(i)
+      document.getElementById(`${i}`).remove()
+    },
+    toRender(i) {
+      this.name = []
+      this.label = []
+      this.dataset.map((d) => {
+        this.name.push(d.name)
+        this.label.push(d.label)
+      })
+      // 重新渲染数据
+      this.g.selectAll('.rect')
+        .data(this.dataset)
+        .attr('height', (d, i) => { return this.height - this.scale().yScale(d.label) })
+        .attr('y', (d) => {
+          return this.scale().yScale(d.label) + this.margin.top
+        })
+      this.g.selectAll('.text')
+        .data(this.dataset)
+        .attr('y', (d) => {
+          return this.scale().yScale(d.label) + this.margin.top
+        })
+        .text(function(d) {
+          return d.label
+        })
+      // 移除输入框
+      this.g.selectAll('.axis').remove()
+      // 重新渲染坐标轴
+      this.g.append('g')
+        .attr('class', 'axis')
+        .attr('transform', `translate(${this.margin.left}, ${this.height + this.margin.top})`)
+        .call(d3.axisBottom(this.scale().xScale))
+      this.g.append('g')
+        .attr('class', 'axis')
+        .attr('transform', `translate(${this.margin.left}, ${this.margin.top})`)
+        .call(d3.axisLeft(this.scale().yScale))
     },
     // 比例尺
     scale() {
@@ -152,7 +246,67 @@ export default {
         xScale,
         yScale
       }
+    },
+    title(id) {
+      const title = document.getElementById(id).innerHTML
+      const that = this
+      // 添加一个文本输入框
+      let input = this.g.append('foreignObject')
+      if (id === 'horizontal') {
+        input = input.attr('x', (this.svgWidth - this.inputWidth) / 2)
+          .attr('y', this.svgHeight - this.margin.bottom + (this.margin.bottom - this.inputHeight) / 2)
+      } else if (id === 'vertical') {
+        console.log((this.svgHeight - this.inputWidth) / 2)
+        input = input.attr('transform', `translate(${(this.margin.left - this.inputHeight) / 2 - 12}, ${(this.svgHeight - this.inputWidth) / 2 + this.inputWidth}) rotate(-90)`)
+      } else {
+        input = input.attr('x', (this.svgWidth - this.inputWidth) / 2)
+          .attr('y', (this.margin.top - this.inputHeight) / 2)
+      }
+      input.attr('width', this.inputWidth)
+        .attr('height', this.inputHeight)
+        .append('xhtml:div')
+        .attr('xmlns', 'http://www.w3.org/1999/xhtml')
+        .append('input')
+        .attr('class', `${id}Input`)
+        .attr('value', title)
+        .style('height', (this.inputHeight - 4) + 'px')
+        .style('width', this.inputWidth + 'px')
+        .style('font-size', '16px')
+        .style('font-weight', '700')
+        .style('padding-left', '10px')
+        .on('change', function() {
+          // 获取输入框中的值
+          const value = document.getElementsByClassName(`${id}Input`).item(0).value
+          that.text.select(`#${id}`).text(value)
+          d3.selectAll('foreignObject').remove()
+        })
     }
+    // vertical(id) {
+    //   // 获取输入框中的值
+    //   const vertical = document.getElementById(id).innerHTML
+    //   const that = this
+    //   // 添加一个文本输入框
+    //   this.g.append('foreignObject')
+    //     .attr('transform', `translate(${this.margin.left * 2 / 5}, ${(this.svgHeight - this.inputHeight) / 2}) rotate(-90)`)
+    //     .attr('width', this.inputWidth)
+    //     .attr('height', this.inputHeight)
+    //     .append('xhtml:div')
+    //     .attr('xmlns', 'http://www.w3.org/1999/xhtml')
+    //     .append('input')
+    //     .attr('class', `${id}Input`)
+    //     .attr('value', vertical)
+    //     .style('height', (this.inputHeight - 4) + 'px')
+    //     .style('width', this.inputWidth + 'px')
+    //     .style('font-size', '16px')
+    //     .style('font-weight', '700')
+    //     .style('padding-left', '10px')
+    //     .on('change', function() {
+    //       // 获取输入框中的值
+    //       const value = document.getElementsByClassName(`${id}Input`).item(0).value
+    //       that.text.select(`#${id}`).text(value)
+    //       d3.selectAll('foreignObject').remove()
+    //     })
+    // }
   }
 }
 </script>
