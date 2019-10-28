@@ -32,6 +32,16 @@ const routes = [
     path: '/line',
     name: 'line',
     component: () => import('../views/line')
+  },
+  {
+    path: '/dragDemo',
+    name: 'dragDemo',
+    component: () => import('../views/dragDemo')
+  },
+  {
+    path: '/doubleLine',
+    name: 'doubleLine',
+    component: () => import('../views/doubleLine')
   }
 ]
 

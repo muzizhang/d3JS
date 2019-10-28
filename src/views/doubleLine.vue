@@ -35,6 +35,32 @@ export default {
           'year': '2010'
         }
       ],
+      datasetTwo: [
+        {
+          'sale': '600',
+          'year': '2000'
+        },
+        {
+          'sale': '115',
+          'year': '2001'
+        },
+        {
+          'sale': '300',
+          'year': '2002'
+        },
+        {
+          'sale': '200',
+          'year': '2003'
+        },
+        {
+          'sale': '400',
+          'year': '2003'
+        },
+        {
+          'sale': '230',
+          'year': '2010'
+        }
+      ],
       margin: {
         top: 100,
         left: 100,
@@ -65,10 +91,13 @@ export default {
       this.coordinates()
       // 创建线条
       this.createLine(this.dataset)
-      // 创建原点
       this.createCircle(this.dataset)
-      // 文字
       this.createText(this.dataset)
+      // 创建原点
+      this.createLine(this.datasetTwo)
+      this.createCircle(this.datasetTwo)
+      this.createText(this.datasetTwo)
+      // 文字
     },
     svg() {
       return d3.select('#line')
@@ -79,7 +108,9 @@ export default {
     },
     // 比例尺
     scale() {
-      this.dataset.map((d) => {
+      // 比较两个数组中的最大值
+      const maxData = this.dataset > this.datasetTwo ? this.dataset : this.datasetTwo
+      maxData.map((d) => {
         this.sale.push(d.sale)
         this.year.push(d.year)
       })
@@ -131,6 +162,7 @@ export default {
     },
     // 创建原点
     createCircle(data) {
+      console.log(data)
       const that = this
       this.g.selectAll('circle')
         .data(data)

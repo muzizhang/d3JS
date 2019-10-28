@@ -70,6 +70,7 @@ export default {
         // 绑定拖拽事件
         d3.drag()
           .on('start', function() {
+            console.log(that.scale().yScale.invert(d3.event.y).toFixed(1))
             console.log('drag start')
           })
           .on('drag', function(d, i) {

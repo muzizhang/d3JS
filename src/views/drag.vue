@@ -94,7 +94,6 @@ export default {
         .attr('text-anchor', 'middle')
         .text('这是一个标题')
         .on('dblclick', () => { this.title('title') })
-      console.log((this.svgHeight - this.inputHeight) / 2)
       this.text.append('text')
         .attr('id', 'vertical')
         .attr('transform', `translate(${(this.margin.left - this.inputHeight) / 2}, ${(this.svgHeight - this.inputHeight) / 2}) rotate(-90)`)
@@ -139,16 +138,15 @@ export default {
               d3.selectAll('foreignObject').remove()
             })
             .on('drag', function(d, i) {
-              let newValue = that.scale().yScale.invert(d3.event.y).toFixed(0)
+              let newValue = Number(that.scale().yScale.invert(d3.event.y - that.margin.top).toFixed(0))
               if (newValue > d3.max(that.label)) newValue = d3.max(that.label)
               if (newValue < 0) newValue = 0
-
               that.dataset[i].label = newValue
               that.toRender(i)
               console.log('drag ing')
             })
-            .on('end', function() {
-              that.toRender()
+            .on('end', function(d, i) {
+              that.toRender(i)
               console.log('drag end')
             })
         )
@@ -237,7 +235,7 @@ export default {
     scale() {
       const xScale = d3.scaleBand()
         .domain(this.name)
-        .rangeRound([0, this.width])
+        .range([0, this.width])
         .padding(0.1)
       const yScale = d3.scaleLinear()
         .domain([0, d3.max(this.label)])
