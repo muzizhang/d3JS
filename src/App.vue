@@ -7,7 +7,8 @@
       <router-link to="/drag">Drag</router-link> |
       <router-link to="/line">Line</router-link> |
       <router-link to="/dragDemo">dragDemo</router-link> |
-      <router-link to="/doubleLine">doubleLine</router-link>
+      <router-link to="/doubleLine">doubleLine</router-link> |
+      <router-link to="/doubleLine2">doubleLine2</router-link>
     </div>
     <router-view />
   </div>

@@ -42,6 +42,11 @@ const routes = [
     path: '/doubleLine',
     name: 'doubleLine',
     component: () => import('../views/doubleLine')
+  },
+  {
+    path: '/doubleLine2',
+    name: 'doubleLine2',
+    component: () => import('../views/doubleLine2')
   }
 ]
 
