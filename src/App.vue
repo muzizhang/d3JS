@@ -9,9 +9,9 @@
       <router-link to="/dragDemo">dragDemo</router-link> |
       <router-link to="/doubleLine">doubleLine</router-link> |
       <router-link to="/doubleLine2">doubleLine2</router-link> |
+      <router-link to="/doubleLine3">doubleLine3</router-link> |
       <router-link to="/reuse">reuse</router-link> |
-      <router-link to="/tableLine">tableLine</router-link> |
-      <router-link to="/doubleLine3">doubleLine3</router-link>
+      <router-link to="/tableLine">tableLine</router-link>
     </div>
     <router-view />
   </div>
