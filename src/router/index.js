@@ -47,6 +47,21 @@ const routes = [
     path: '/doubleLine2',
     name: 'doubleLine2',
     component: () => import('../views/doubleLine2')
+  },
+  {
+    path: '/doubleLine3',
+    name: 'doubleLine3',
+    component: () => import('../views/doubleLine3')
+  },
+  {
+    path: '/reuse',
+    name: 'reuse',
+    component: () => import('../views/reuse')
+  },
+  {
+    path: '/tableLine',
+    name: 'tableLine',
+    component: () => import('../views/tableLine')
   }
 ]
 

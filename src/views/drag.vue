@@ -75,6 +75,7 @@ export default {
         this.label.push(d.label)
       })
       this.g = (this.svg).append('g').attr('class', 'oneStep')
+      console.log(d3.axisBottom(this.scale().xScale))
       this.g.append('g')
         .attr('class', 'axis')
         .attr('transform', `translate(${this.margin.left}, ${this.height + this.margin.top})`)

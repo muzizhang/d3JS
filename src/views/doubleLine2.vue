@@ -1,6 +1,6 @@
 <template>
   <div class="control-group">
-    <button @click="update()">Update</button>
+    <button style="display: block;margin: 0 auto;" @click="update()">Update</button>
   </div>
 </template>
 
@@ -22,6 +22,7 @@ export default {
         bottom: 30
       },
       svg: '',
+      g: '',
       x: '',
       y: '',
       width: 0,
@@ -47,7 +48,6 @@ export default {
           }
         }))
       }
-      // 生产线段
       this.lineChart()
         .x(d3.scaleLinear().domain([0, 10]))
         .y(d3.scaleLinear().domain([0, 10]))
@@ -84,7 +84,6 @@ export default {
         return that.chart
       }
       this.chart.colors = function(c) {
-        console.log(c)
         if (!arguments.length) return that.colors
         that.colors = c
         return that.chart
@@ -109,55 +108,57 @@ export default {
     renderDom() {
       this.chart.render = () => {
         if (!this.svg) {
-          this.svg = d3.selectAll('body').append('svg')
+          this.svg = d3.select('.control-group')
+            .append('svg')
+            .style('margin', '20px auto')
             .attr('width', this.svgWidth)
             .attr('height', this.svgHeight)
             .style('background-color', 'pink')
           // 坐标轴
-          this.renderAxes(this.svg)
+          this.renderAxes()
           // 拷贝body
-          this.defineBodyClip(this.svg)
+          // this.defineBodyClip(this.svg)
         }
         // 渲染body
-        this.renderBody(this.svg)
+        // this.renderBody(this.svg)
       }
       // this.chart
       return this.chart.render()
     },
     // 坐标轴
-    renderAxes(svg) {
-      const axesG = svg.append('g')
-        .attr('class', 'axes')
-      this.renderXAxis(axesG)
-      this.renderYAxis(axesG)
+    renderAxes() {
+      this.g = this.svg.append('g')
+        .attr('class', 'oneStep')
+      this.renderXAxis()
+      this.renderYAxis()
     },
     // 横轴
-    renderXAxis(axesG) {
-      axesG.append('g')
+    renderXAxis() {
+      this.g.append('g')
         .attr('class', 'x axis')
         .attr('transform', `translate(${this.margins.left}, ${this.height + this.margins.top})`)
-        .call(d3.axisBottom(this.x.range([0, this.width])))
-      d3.selectAll('g.x g.tick')
-        .append('line')
-        .classed('grid-line', true)
-        .attr('x1', 0)
-        .attr('y1', 0)
-        .attr('x2', 0)
-        .attr('y2', -this.height)
+        .call(d3.axisBottom().scale(this.x.range([0, this.width])).ticks(5))
+      // d3.selectAll('g.x g.tick')
+      //   .append('line')
+      //   .classed('grid-line', true)
+      //   .attr('x1', 0)
+      //   .attr('y1', 0)
+      //   .attr('x2', 0)
+      //   .attr('y2', -this.height)
     },
     // 竖轴
-    renderYAxis(axesG) {
-      axesG.append('g')
+    renderYAxis() {
+      this.g.append('g')
         .attr('class', 'y axis')
         .attr('transform', `translate(${this.margins.left}, ${this.margins.top})`)
         .call(d3.axisLeft().scale(this.y.range([this.height, 0])))
-      d3.selectAll('g.y g.tick')
-        .append('line')
-        .classed('grid-line', true)
-        .attr('x1', 0)
-        .attr('y1', 0)
-        .attr('x2', this.width)
-        .attr('y2', 0)
+      // d3.selectAll('g.y g.tick')
+      //   .append('line')
+      //   .classed('grid-line', true)
+      //   .attr('x1', 0)
+      //   .attr('y1', 0)
+      //   .attr('x2', this.height)
+      //   .attr('y2', 0)
     },
     /**
      * defs 可重复利用区域
