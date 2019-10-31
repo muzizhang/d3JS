@@ -280,32 +280,6 @@ export default {
           d3.selectAll('foreignObject').remove()
         })
     }
-    // vertical(id) {
-    //   // 获取输入框中的值
-    //   const vertical = document.getElementById(id).innerHTML
-    //   const that = this
-    //   // 添加一个文本输入框
-    //   this.g.append('foreignObject')
-    //     .attr('transform', `translate(${this.margin.left * 2 / 5}, ${(this.svgHeight - this.inputHeight) / 2}) rotate(-90)`)
-    //     .attr('width', this.inputWidth)
-    //     .attr('height', this.inputHeight)
-    //     .append('xhtml:div')
-    //     .attr('xmlns', 'http://www.w3.org/1999/xhtml')
-    //     .append('input')
-    //     .attr('class', `${id}Input`)
-    //     .attr('value', vertical)
-    //     .style('height', (this.inputHeight - 4) + 'px')
-    //     .style('width', this.inputWidth + 'px')
-    //     .style('font-size', '16px')
-    //     .style('font-weight', '700')
-    //     .style('padding-left', '10px')
-    //     .on('change', function() {
-    //       // 获取输入框中的值
-    //       const value = document.getElementsByClassName(`${id}Input`).item(0).value
-    //       that.text.select(`#${id}`).text(value)
-    //       d3.selectAll('foreignObject').remove()
-    //     })
-    // }
   }
 }
 </script>
